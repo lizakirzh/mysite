@@ -1,8 +1,15 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .models import Advertisement
 
 def index(requests):
-    return render(requests, 'index.html')
+    advertisements = Advertisement.objects.all()
+
+    context = {
+        "advertisements": advertisements
+    }
+
+    return render(requests, 'index.html', context)
 
 
 
