@@ -22,3 +22,14 @@ class Advertisement(models.Model):
 
     def __str__(self): 
         return f'<Advertisement: Advertisement(id={self.id}, title={self.title}, price={self.price})>'
+    
+    def admin_thumbnail(self):
+        return u'<img src="%s" />' % (self.image.url)
+    admin_thumbnail.short_description = 'Thumbnail'
+    admin_thumbnail.allow_tags = True
+
+    if (has_post_thumbnail()):
+        the_post_thumbnail(); 
+    else:
+        print i=static/img/adv.png; 
+    endif;
