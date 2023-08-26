@@ -1,35 +1,47 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib import admin
 from django.utils.html import format_html
-
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 
+
 class Advertisement(models.Model):
-    title = models.CharField(max_length=80, verbose_name="заголовок")
-    description = models.TextField("описание")
+    id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=60)
+    description = models.TextField()
     price = models.DecimalField(max_digits=12, decimal_places=2)
-    auction = models.BooleanField("возможность торга", help_text="Отметьте, если торг уместен")
-    created_at = models.DateTimeField("дата создания", auto_now_add = True)
-    updated_at = models.DateTimeField(auto_now = True)
+    auction = models.BooleanField(help_text="Торг")
+    create_ad = models.DateTimeField(auto_now_add=True)
+    updated_ad = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="images/")
+    image = models.ImageField(upload_to="advertisements")
 
-    class Meta: 
-        db_table = 'advertisements'
+    @admin.display
+    def create_date(self):
+        from django.utils import timezone
+        if self.create_ad.date() == timezone.now().date():
+            create_time = self.create_ad.time().strftime("%H:%M")
+            return format_html("<span style='color: green'>Сегодня в {}</span>", create_time)
+        return self.create_ad.strftime("%d.%m.%Y - %H:%M")
 
-    def __str__(self): 
-        return f'<Advertisement: Advertisement(id={self.id}, title={self.title}, price={self.price})>'
-    
-    def admin_thumbnail(self):
-        return u'<img src="%s" />' % (self.image.url)
-    admin_thumbnail.short_description = 'Thumbnail'
-    admin_thumbnail.allow_tags = True
+    @admin.display
+    def update_date(self):
+        from django.utils import timezone
+        if self.updated_ad.date() == timezone.now().date():
+            update_time = self.updated_ad.time().strftime("%H:%M")
+            return format_html("<span style='color: blue'>Сегодня в {}</span>", update_time)
+        return self.updated_ad.strftime("%d.%m.%Y - %H:%M")
 
-    if (has_post_thumbnail()):
-        the_post_thumbnail(); 
-    else:
-        print i=static/img/adv.png; 
-    endif;
+    @admin.display
+    def view_image(self):
+        if self.image != "":
+            return format_html("<img src={} width='50'>", self.image.url)
+        return "Нет изображения!"
+
+    def __str__(self):
+        return f'id={self.id} title={self.title}, price={self.price}'
+
+    class Meta:
+        db_table = 'advertisement'
