@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
+from .forms import ExtendedUserCreationForm
 
 
 def my_login(request):
@@ -30,3 +31,21 @@ def my_logout(request):
     login_url = reverse("login")
     logout(request)
     return redirect(login_url)
+
+
+def register_view(request):
+    if request.method == "POST":
+        form = ExtendedUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user = authenticate(username=user.username, password=request.POST['password1'])
+            login(request, user=user)
+            return redirect(reverse('profile'))
+    else:
+        form = ExtendedUserCreationForm()
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'app_auth/register.html', context)
